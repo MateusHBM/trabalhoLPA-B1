@@ -11,6 +11,11 @@
 #define PESO_ATE_5_KG 0.05
 #define PESO_ATE_10_KG 0.10
 #define PESO_ACIMA_10_KG 0.20
+#define PERCENTUAL_ECONOMICA 0.00
+#define PERCENTUAL_EXPRESSA 0.15
+#define PERCENTUAL_PRIORITARIA 0.30
+#define VALOR_PROTECAO 7.50
+#define VALOR_TENTATIVA_ADICIONAL 4.00
 
 void mostrarPergunta(int campo) {
     switch (campo) {
@@ -103,11 +108,37 @@ double identificarPercentualPeso(double peso) {
     return PESO_ACIMA_10_KG;
 }
 
+double identificarPercentualModalidade(int modalidade) {
+    if (modalidade == 1) {
+        return PERCENTUAL_ECONOMICA;
+    }
+    if (modalidade == 2) {
+        return PERCENTUAL_EXPRESSA;
+    }
+    return PERCENTUAL_PRIORITARIA;
+}
+
+double calcularValorFinal(double subtotal, double peso, int modalidade,
+                          int protecao, int tentativas) {
+    double adicionalPeso = subtotal * identificarPercentualPeso(peso);
+    double adicionalModalidade = subtotal * identificarPercentualModalidade(modalidade);
+    double adicionalProtecao = 0.0;
+    double adicionalTentativas = tentativas * VALOR_TENTATIVA_ADICIONAL;
+
+    if (protecao == 1) {
+        adicionalProtecao = VALOR_PROTECAO;
+    }
+    /* Os dois percentuais incidem sobre o mesmo subtotal inicial. */
+    return subtotal + adicionalPeso + adicionalModalidade
+           + adicionalProtecao + adicionalTentativas;
+}
+
 int main(void) {
     double distancia;
     double peso;
     double subtotal;
     double adicionalPeso;
+    double valorFinal;
     int modalidade;
     int protecao;
     int tentativas;
@@ -132,6 +163,8 @@ int main(void) {
         adicionalPeso = subtotal * identificarPercentualPeso(peso);
         printf("Subtotal inicial: R$ %.2f\n", subtotal);
         printf("Adicional de peso: R$ %.2f\n", adicionalPeso);
+        valorFinal = calcularValorFinal(subtotal, peso, modalidade, protecao, tentativas);
+        printf("Valor final da entrega: R$ %.2f\n", valorFinal);
         continuar = lerInteiro(6, 0, 1);
     }
     return 0;
