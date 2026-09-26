@@ -133,6 +133,26 @@ double calcularValorFinal(double subtotal, double peso, int modalidade,
            + adicionalProtecao + adicionalTentativas;
 }
 
+void mostrarResumo(int quantidade, double total, int economicas, int expressas,
+                   int prioritarias, double maior, double menor) {
+    printf("\n=== Resumo da sessao ===\n");
+    printf("Quantidade total de entregas: %d\n", quantidade);
+    printf("Valor total: R$ %.2f\n", total);
+    printf("Entregas Economicas: %d\n", economicas);
+    printf("Entregas Expressas: %d\n", expressas);
+    printf("Entregas Prioritarias: %d\n", prioritarias);
+    if (quantidade > 0) {
+        printf("Valor medio: R$ %.2f\n", total / quantidade);
+        printf("Maior valor: R$ %.2f\n", maior);
+        printf("Menor valor: R$ %.2f\n", menor);
+    } else {
+        printf("Nenhuma entrega processada.\n");
+        printf("Valor medio: nao se aplica.\n");
+        printf("Maior valor: nao se aplica.\n");
+        printf("Menor valor: nao se aplica.\n");
+    }
+}
+
 int main(void) {
     double distancia;
     double peso;
@@ -143,6 +163,13 @@ int main(void) {
     int protecao;
     int tentativas;
     int continuar = 1;
+    int quantidade = 0;
+    int economicas = 0;
+    int expressas = 0;
+    int prioritarias = 0;
+    double total = 0.0;
+    double maior = 0.0;
+    double menor = 0.0;
 
     printf("Simulador de Entregas - Trabalho B1\n");
     printf("Use ponto para separar as casas decimais.\n");
@@ -165,7 +192,29 @@ int main(void) {
         printf("Adicional de peso: R$ %.2f\n", adicionalPeso);
         valorFinal = calcularValorFinal(subtotal, peso, modalidade, protecao, tentativas);
         printf("Valor final da entrega: R$ %.2f\n", valorFinal);
+        /* A primeira entrega inicializa os extremos com um valor real. */
+        if (quantidade == 0) {
+            maior = valorFinal;
+            menor = valorFinal;
+        } else {
+            if (valorFinal > maior) {
+                maior = valorFinal;
+            }
+            if (valorFinal < menor) {
+                menor = valorFinal;
+            }
+        }
+        quantidade++;
+        total += valorFinal;
+        if (modalidade == 1) {
+            economicas++;
+        } else if (modalidade == 2) {
+            expressas++;
+        } else {
+            prioritarias++;
+        }
         continuar = lerInteiro(6, 0, 1);
     }
+    mostrarResumo(quantidade, total, economicas, expressas, prioritarias, maior, menor);
     return 0;
 }
