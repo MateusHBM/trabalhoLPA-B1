@@ -2,6 +2,16 @@
 #include <limits.h>
 #include <math.h>
 
+#define TARIFA_POR_KM 1.20
+#define BASE_ATE_5_KM 8.00
+#define BASE_ATE_15_KM 12.00
+#define BASE_ATE_30_KM 18.00
+#define BASE_ACIMA_30_KM 25.00
+#define PESO_ATE_2_KG 0.00
+#define PESO_ATE_5_KG 0.05
+#define PESO_ATE_10_KG 0.10
+#define PESO_ACIMA_10_KG 0.20
+
 void mostrarPergunta(int campo) {
     switch (campo) {
         case 1: printf("Distancia em km (maior que zero): "); break;
@@ -63,9 +73,41 @@ int lerInteiro(int campo, int minimo, int maximo) {
     }
 }
 
+double identificarValorBase(double distancia) {
+    if (distancia <= 5.0) {
+        return BASE_ATE_5_KM;
+    }
+    if (distancia <= 15.0) {
+        return BASE_ATE_15_KM;
+    }
+    if (distancia <= 30.0) {
+        return BASE_ATE_30_KM;
+    }
+    return BASE_ACIMA_30_KM;
+}
+
+double calcularSubtotal(double distancia) {
+    return identificarValorBase(distancia) + distancia * TARIFA_POR_KM;
+}
+
+double identificarPercentualPeso(double peso) {
+    if (peso <= 2.0) {
+        return PESO_ATE_2_KG;
+    }
+    if (peso <= 5.0) {
+        return PESO_ATE_5_KG;
+    }
+    if (peso <= 10.0) {
+        return PESO_ATE_10_KG;
+    }
+    return PESO_ACIMA_10_KG;
+}
+
 int main(void) {
     double distancia;
     double peso;
+    double subtotal;
+    double adicionalPeso;
     int modalidade;
     int protecao;
     int tentativas;
@@ -86,6 +128,10 @@ int main(void) {
         if (tentativas < 0) break;
         printf("Dados validados: %.2f km, %.2f kg, modalidade %d, protecao %d, tentativas %d.\n",
                distancia, peso, modalidade, protecao, tentativas);
+        subtotal = calcularSubtotal(distancia);
+        adicionalPeso = subtotal * identificarPercentualPeso(peso);
+        printf("Subtotal inicial: R$ %.2f\n", subtotal);
+        printf("Adicional de peso: R$ %.2f\n", adicionalPeso);
         continuar = lerInteiro(6, 0, 1);
     }
     return 0;
